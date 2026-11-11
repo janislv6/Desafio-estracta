@@ -20,7 +20,6 @@ final class SefazBaSpider implements Spider
     {
         $html = $this->obterResposta($consulta);
        
-
         if (preg_match('#<b>Cnpj\s*incorreto</b>\s*-\s*d.{1,8}gito\s*verificador\s*!</td>#is', $html)) {
             throw new ConsultaException('Cnpj incorreto - dígito verificador!');
         }
@@ -28,7 +27,6 @@ final class SefazBaSpider implements Spider
         if (preg_match('#Nenhum\s*registro\s*encontrado\s*!#is', $html)) {
             throw new ConsultaException('Nenhum registro encontrado!');
         }
-
 
         $parsed = $this->parseResposta($html);
 
@@ -111,7 +109,11 @@ final class SefazBaSpider implements Spider
     public function parseResposta(string $html): CadastroContribuinte
     {
         $html = preg_replace('#&nbsp;#is', '', $html);
-    
+
+        if ($this->getCnpj($html) === null) {
+            throw new ConsultaException('Resposta inesperada da SEFAZ: dados cadastrais não encontrados.');
+        }
+
         $inscricaoEstadual = $this->getInscricaoEstadual($html);
         $cnpj = $this->getCnpj($html);
         $razaoSocial = $this->getRazaoSocial($html);
