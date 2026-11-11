@@ -61,20 +61,15 @@ it('retorna null para campos ausentes no HTML', function () {
 
 
 
-it('retorna campos ausentes quando recebe um HTML inesperado', function () {
+it('lança exceção quando recebe um HTML inesperado', function () {
     $html = '<html><body>Página indisponível</body></html>';
 
     $spider = new SefazBaSpider();
 
-    $resultado = $spider->parseResposta($html);
-
-    expect($resultado->inscricaoEstadual)->toBeNull()
-        ->and($resultado->cnpj)->toBeNull()
-        ->and($resultado->razaoSocial)->toBeNull()
-        ->and($resultado->nomeFantasia)->toBeNull()
-        ->and($resultado->situacaoCadastral)->toBeNull()
-        ->and($resultado->endereco)->toBeNull()
-        ->and($resultado->atividadeEconomica)->toBeNull()
-        ->and($resultado->regimeApuracao)->toBeNull();
+    expect(fn () => $spider->parseResposta($html))
+        ->toThrow(
+            \ProvaSpider\Exception\ConsultaException::class,
+            'Resposta inesperada da SEFAZ: dados cadastrais não encontrados.'
+        );
 });
 
